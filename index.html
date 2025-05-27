@@ -1,56 +1,122 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <title>Daftar Bahan - Jamuku</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Jamuku - Daftar Bahan</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <h2>Daftar Bahan</h2>
+<h2>Daftar Bahan</h2>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Nama</th>
-                <th>Jenis</th>
-                <th>Harga</th>
-                <th>Jumlah</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Contoh data bahan -->
-            <tr>
-                <td>Kunyit</td>
-                <td>Bahan utama</td>
-                <td>1500</td>
-                <td><input type="number" value="1" min="1"></td>
-                <td><button>Tambah</button></td>
-            </tr>
-            <tr>
-                <td>Jahe</td>
-                <td>Bahan utama</td>
-                <td>1200</td>
-                <td><input type="number" value="1" min="1"></td>
-                <td><button>Tambah</button></td>
-            </tr>
-            <tr>
-                <td>Gula Merah</td>
-                <td>Pemanis</td>
-                <td>1000</td>
-                <td><input type="number" value="1" min="1"></td>
-                <td><button>Tambah</button></td>
-            </tr>
-            <!-- Tambahkan baris lain sesuai kebutuhan -->
-        </tbody>
-    </table>
+<table id="tabel-bahan">
+  <thead>
+    <tr>
+      <th>Nama</th>
+      <th>Jenis</th>
+      <th>Harga</th>
+      <th>Jumlah</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Kunyit</td>
+      <td>Bahan utama</td>
+      <td>1500</td>
+      <td><input type="number" min="1" value="1"></td>
+      <td><button onclick="tambahKeranjang(this)">Tambah</button></td>
+    </tr>
+    <tr>
+      <td>Jahe</td>
+      <td>Bahan utama</td>
+      <td>1200</td>
+      <td><input type="number" min="1" value="1"></td>
+      <td><button onclick="tambahKeranjang(this)">Tambah</button></td>
+    </tr>
+    <tr>
+      <td>Gula Merah</td>
+      <td>Pemanis</td>
+      <td>1000</td>
+      <td><input type="number" min="1" value="1"></td>
+      <td><button onclick="tambahKeranjang(this)">Tambah</button></td>
+    </tr>
+  </tbody>
+</table>
 
-    <div id="keranjang">
-        <h3>Keranjang Belanja</h3>
-        <p>Total Belanja: <strong>0</strong></p>
-        <button id="reset-btn">Reset Keranjang</button>
-    </div>
+<div id="keranjang">
+  <h3>Keranjang Belanja</h3>
+  <table id="tabel-keranjang">
+    <thead>
+      <tr>
+        <th>Nama</th>
+        <th>Jumlah</th>
+        <th>Subtotal</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <p><strong>Total Belanja:</strong> <span id="total-belanja">0</span></p>
+  <button onclick="resetKeranjang()">Reset Keranjang</button>
+  <button onclick="bayar()">Bayar</button>
+</div>
+
+<script>
+  let keranjang = {};
+
+  function tambahKeranjang(btn) {
+    const row = btn.closest('tr');
+    const nama = row.cells[0].innerText;
+    const harga = parseInt(row.cells[2].innerText);
+    const jumlah = parseInt(row.cells[3].querySelector('input').value);
+
+    if (!keranjang[nama]) {
+      keranjang[nama] = { harga, jumlah };
+    } else {
+      keranjang[nama].jumlah += jumlah;
+    }
+
+    renderKeranjang();
+  }
+
+  function hapusItem(nama) {
+    delete keranjang[nama];
+    renderKeranjang();
+  }
+
+  function resetKeranjang() {
+    keranjang = {};
+    renderKeranjang();
+  }
+
+  function renderKeranjang() {
+    const tbody = document.querySelector('#tabel-keranjang tbody');
+    tbody.innerHTML = '';
+    let total = 0;
+
+    for (const [nama, item] of Object.entries(keranjang)) {
+      const subtotal = item.harga * item.jumlah;
+      total += subtotal;
+      const row = `
+        <tr>
+          <td>${nama}</td>
+          <td>${item.jumlah}</td>
+          <td>${subtotal}</td>
+          <td><button onclick="hapusItem('${nama}')">Hapus</button></td>
+        </tr>
+      `;
+      tbody.insertAdjacentHTML('beforeend', row);
+    }
+
+    document.getElementById('total-belanja').innerText = total;
+  }
+
+  function bayar() {
+    alert("Pembayaran berhasil! Terima kasih. Total: " + document.getElementById('total-belanja').innerText);
+    resetKeranjang();
+  }
+</script>
 
 </body>
 </html>
